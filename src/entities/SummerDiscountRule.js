@@ -1,6 +1,6 @@
 import { DiscountRule } from './DiscountRule.js';
 
-export class SummerDiscountRule extends DiscountRule{
+export class SummerDiscountRule extends DiscountRule {
     isValid(code) {
         return code === 'SUMMER10';
     }
