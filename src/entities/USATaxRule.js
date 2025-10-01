@@ -5,7 +5,7 @@ export class USATaxRule extends TaxRule {
     constructor() {
         super();
         this.taxRates = {
-            eletronics: 0.1,
+            electronics: 0.1,
             clothing: 0.05,
             default: 0.08
         };
@@ -20,7 +20,7 @@ export class USATaxRule extends TaxRule {
         return Object.keys(this.taxRates).includes(category);
     }
 
-    calculate(state, category, price) {
+    calculateTax(state, category, price) {
         const rate = this.taxRates[category] ?? this.taxRates ['default'];
         return price * rate;
     }

@@ -10,7 +10,7 @@ class DefaultTaxRule extends TaxRule {
         return true;
     }
 
-    calculate(state, category, price) {
+    calculateTax(state, category, price) {
         return price * 0.05;
     }
 }
