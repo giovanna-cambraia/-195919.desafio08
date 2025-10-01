@@ -1,81 +1,67 @@
+// app.js
 import express from "express";
+import { TaxFactory } from "./src/factories/TaxFactory.js";
+import { DiscountFactory } from "./src/factories/DiscountFactory.js";
 
 const app = express();
+const PORT = 3000;
 
-function calculate(country, state, category, price, discountCode) {
-    let tax = 0;
-    let discount = 0;
+app.get("/calculate", (req, res) => {
+  const { country, state, category, price, discountCode } = req.query;
 
-    if (country === 'USA') {
-        if (state === 'CA') {
-            if (category === 'electronics') {
-                tax = price * 0.0825;
-            } else if (category === 'books') {
-                tax = price * 0.07;
-            } else {
-                tax = price * 0.08;
-            }
-        } else if (state === 'TX') {
-            if (category === 'electronics') {
-                tax = price * 0.08;
-            } else {
-                tax = price * 0.06;
-            }
-        } else {
-            tax = price * 0.05;
-        }
-    } else if (country === 'Canada') {
-        if (category === 'electronics') {
-            tax = price * 0.12;
-        } else {
-            tax = price * 0.1;
-        }
-    } else {
-        tax = price * 0.15; // Taxa padrão para outros países
+  if (!country || !state || !category || !price) {
+    return res.status(400).json({ error: "Parâmetros obrigatórios faltando." });
+  }
+
+  const amount = Number(price);
+
+  // Cria regra de imposto
+  const taxRule = TaxFactory.create(country);
+  if (!taxRule.isValidState(state)) {
+    return res.status(400).json({ error: "Estado inválido para o país." });
+  }
+  if (!taxRule.isValidCategory(state, category)) {
+    return res.status(400).json({ error: "Categoria inválida para o país/estado." });
+  }
+
+  const tax = taxRule.calculateTax(state, category, amount);
+
+  // Cria regra de desconto
+  let discount = 0;
+  if (discountCode) {
+    const discountRule = DiscountFactory.create(discountCode);
+    if (discountRule.isValid(discountCode)) {
+      discount = discountRule.calculate(amount);
     }
+  }
 
-    if (discountCode) {
-        if (discountCode === 'SUMMER10') {
-            discount = price * 0.1;
-        } else if (discountCode === 'WINTER15') {
-            discount = price * 0.15;
-        } else {
-            discount = 0;
-        }
-    }
+  const finalPrice = amount + tax - discount;
 
-    const finalPrice = price + tax - discount;
+  // Log no console
+  console.log(`
+==== Relatório da Operação ====
+País: ${country}
+Estado: ${state}
+Categoria: ${category}
+Preço Base: ${amount}
+Impostos: ${tax.toFixed(2)}
+Desconto: ${discount.toFixed(2)}
+Preço Final: ${finalPrice.toFixed(2)}
+===============================
+`);
 
-    // Relatório estruturado
-    const report = {
-        country,
-        state,
-        category,
-        price,
-        discountCode,
-        tax: parseFloat(tax.toFixed(2)),
-        discount: parseFloat(discount.toFixed(2)),
-        finalPrice: parseFloat(finalPrice.toFixed(2)),
-    };
-
-    return report;
-}
-
-
-app.get('/calculate', (req, res) => {
-    const { country, state, category, price, discountCode } = req.query;
-
-    if (!country || !state || !category || isNaN(parseFloat(price))) {
-        res.status(400).send('Parâmetros ausentes ou inválidos');
-        return;
-    }
-
-    const report = calculate(country, state, category, parseFloat(price), discountCode);
-
-    res.send(report);
+  res.json({
+    country,
+    state,
+    category,
+    price: amount,
+    discountCode: discountCode || null,
+    tax: parseFloat(tax.toFixed(2)),
+    discount: parseFloat(discount.toFixed(2)),
+    finalPrice: parseFloat(finalPrice.toFixed(2)),
+  });
 });
 
-// Inicialização do servidor
-app.listen(3000, () => {
-    console.log('Servidor rodando na porta 3000');
+app.listen(PORT, () => {
+  console.log('🚀 Servidor rodando em 3000');
 });

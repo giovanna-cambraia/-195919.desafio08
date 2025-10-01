@@ -1,11 +1,11 @@
 // CanadaTaxRule.js
-import TaxRule from './TaxRule';
+import TaxRule from './TaxRule.js';
 
-class CanadaTaxRule extends TaxRule {
+export class CanadaTaxRule extends TaxRule {
     constructor() {
         super();
         this.taxRates = {
-            eletronics: 0.15,
+            electronics: 0.15,
             clothing: 0.12,
             default: 0.13
         };

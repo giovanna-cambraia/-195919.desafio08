@@ -1,7 +1,7 @@
 // USATaxRule.js
-import TaxRule from './TaxRule';
+import TaxRule from './TaxRule.js';
 
-class USATaxRule extends TaxRule {
+export class USATaxRule extends TaxRule {
     constructor() {
         super();
         this.taxRates = {

@@ -5,10 +5,10 @@ class TaxRule {
     }
 
     isValidCategory(state, category) {
-        throw new Error*("Method 'isValidCategory' must be implemented,");
+        throw new Error("Method 'isValidCategory' must be implemented,");
     }
 
-    calculateTax(state, category, amount) {
+    calculateTax(state, category, price) {
         throw new Error("Method 'calculateTax' must be implemented,");
     }
 }

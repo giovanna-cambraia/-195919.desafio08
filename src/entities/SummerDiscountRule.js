@@ -1,11 +1,16 @@
-import { DiscountRule } from './DiscountRule.js';
+import { DiscountRule } from "./DiscountRule.js";
 
 export class SummerDiscountRule extends DiscountRule {
-    isValid(code) {
-        return code === 'SUMMER10';
-    }
+  constructor(discountValue) {
+    super();
+    this.discountValue = discountValue;
+  }
 
-    calculate(price) {
-        return price * 0.1;
-    }
+  isValid(code) {
+    return code === "SUMMER10";
+  }
+
+  calculate(price) {
+    return price * this.discountValue;
+  }
 }
